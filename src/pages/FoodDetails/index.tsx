@@ -89,18 +89,37 @@ const FoodDetails: React.FC = () => {
 
   function handleIncrementExtra(id: number): void {
     // Increment extra quantity
+    const newExtras = extras.map(extra =>
+      extra.id === id
+        ? { ...extra, quantity: extra.quantity ? extra.quantity + 1 : 1 }
+        : { ...extra },
+    );
+    setExtras(newExtras);
   }
 
   function handleDecrementExtra(id: number): void {
     // Decrement extra quantity
+    const newExtras = extras.map(extra =>
+      extra.id === id
+        ? {
+            ...extra,
+            quantity: extra.quantity > 1 ? extra.quantity - 1 : 0,
+          }
+        : { ...extra },
+    );
+    setExtras(newExtras);
   }
 
   function handleIncrementFood(): void {
     // Increment food quantity
+    setFoodQuantity(foodQuantity + 1);
   }
 
   function handleDecrementFood(): void {
     // Decrement food quantity
+    if (foodQuantity > 1) {
+      setFoodQuantity(foodQuantity - 1);
+    }
   }
 
   const toggleFavorite = useCallback(() => {
@@ -110,10 +129,23 @@ const FoodDetails: React.FC = () => {
 
   const cartTotal = useMemo(() => {
     // Calculate cartTotal
+    const totalAdicionais = extras.reduce((acc, ctx) => {
+      ctx.quantity = ctx.quantity ? ctx.quantity : 0;
+      return acc + ctx.value * ctx.quantity;
+    }, 0);
+
+    return formatValue((food.price + totalAdicionais) * foodQuantity);
   }, [extras, food, foodQuantity]);
 
   async function handleFinishOrder(): Promise<void> {
     // Finish the order and save on the API
+    const newOrder = {
+      ...food,
+      extras: [...extras],
+      quantity: foodQuantity,
+    };
+
+    console.log(newOrder);
   }
 
   // Calculate the correct icon name
